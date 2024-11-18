@@ -1,0 +1,55 @@
+package io.github.baoozak.dashstar.handler;
+
+import io.github.baoozak.dashstar.model.Article;
+import io.github.baoozak.dashstar.model.Comment;
+import io.github.baoozak.dashstar.model.User;
+import io.github.baoozak.dashstar.repository.ArticleRepository;
+import io.github.baoozak.dashstar.repository.CommentRepository;
+import io.github.baoozak.dashstar.repository.UserRepository;
+import io.github.baoozak.dashstar.security.Secured;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Path("/comments")
+public class CommentHandler {
+
+    @Inject
+    private CommentRepository commentRepository;
+
+    @Inject
+    private UserRepository userRepository;
+
+    @Inject
+    private ArticleRepository articleRepository;
+
+    @POST
+    @Path("/")
+    @Secured({"user", "admin"})
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createComment(Comment comment, @Context SecurityContext securityContext) {
+        // 根据当前安全上下文中用户主体的名称查找用户
+        User user = userRepository.findByID(Integer.valueOf(securityContext.getUserPrincipal().getName()));
+        comment.setUser(user);
+        // 根据评论中指定的文章ID查找文章
+        Article article = articleRepository.findByID(comment.getArticleId());
+        comment.setArticle(article);
+        // 设置评论的创建时间戳
+        comment.setCreatedAt(System.currentTimeMillis() / 1000);
+        // 在数据库中创建评论
+        commentRepository.create(comment);
+        // 准备响应数据
+        Map<String, Object> res = new HashMap<>();
+        res.put("code", Response.Status.OK);
+        // 返回表示操作成功的响应
+        return Response.status(Response.Status.OK).entity(res).build();
+    }
+
+}
