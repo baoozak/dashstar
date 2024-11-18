@@ -14,7 +14,7 @@ import {
     ListItemText,
     Card,
     CardContent,
-    Stack,
+    Stack, Pagination,
 } from "@mui/material";
 import { Article } from "@/models/article.ts";
 import { Create, Add } from "@mui/icons-material";
@@ -23,26 +23,32 @@ import useAuthStore from "@/stores/auth.ts";
 import { api } from "@/utils/axios.ts";
 import useSiteStore from "@/stores/site.ts";
 
+
 export default function HomePage() {
     const authStore = useAuthStore();
     const siteStore = useSiteStore();
     const navigator = useNavigate();
-    const [users, setUsers] = useState<Array<string>>();
+    const [users, ] = useState<Array<string>>();
 
     const [articles, setArticles] = useState<Array<Article>>();
+    const [totalArticles, setTotalArticles] = useState(0);
+    const [page, setPage] = useState(1);
+    const [pageSize, ] = useState(5);
 
     useEffect(() => {
-        api().get("/articles").then(
+        api().get(`/articles?page=${page}&size=${pageSize}`).then(
             (res) => {
                 const r = res.data;
-                setArticles(r.data?.reverse());
-                let userName = r.data.map((item: any) => item.author.username);
-                userName = userName.reverse();
-                setUsers(userName);
+                // 确保 r.data 是数组，并且 r.totalArticles 是数字
+                setArticles(r.data ? r.data.reverse() : []);
+                setTotalArticles(r.totalArticles || 0); // 新增代码行，假设 totalArticles 在响应的顶层
             },
         );
-    }, []);
+    }, [page, pageSize]);
 
+    const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
+        setPage(value);
+    };
 
     return (
         <Container maxWidth="md" sx={{ py: 4 }}>
@@ -180,6 +186,7 @@ export default function HomePage() {
                     </List>
                 )}
             </Paper>
+            <Pagination count={Math.ceil(totalArticles / pageSize)} page={page} onChange={handlePageChange} color="primary" />
         </Container>
     );
 }

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "element-react": "^1.4.34",
+    "element-theme-default": "^1.4.13"
+  }
+}

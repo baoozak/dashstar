@@ -101,4 +101,9 @@ public class ArticleRepository {
             em.close();
         }
     }
+
+    public long countAll() {
+        EntityManager em = HibernateUtil.getEntityManager();
+        return em.createQuery("SELECT COUNT(a) FROM Article a", Long.class).getSingleResult();
+    }
 }

@@ -36,7 +36,9 @@ public class ArticleHandler {
     public Response getAllArticles(@QueryParam("page") @DefaultValue("1") int page,
                                    @QueryParam("size") @DefaultValue("5") int size) {
         List<Article> articles = articleRepository.findAll(page, size);
+        long totalArticles = articleRepository.countAll();  // 新增代码行
         Map<String, Object> res = new HashMap<>();
+        res.put("totalArticles", totalArticles);  // 新增代码行
         res.put("code", Response.Status.OK);
         res.put("data", articles);
         return Response.status(Response.Status.OK).entity(res).build();
