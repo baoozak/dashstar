@@ -7,8 +7,8 @@ import { Comment } from "@/models/comment.ts";
 import useAuthStore from "@/stores/auth.ts";
 
 
-function MyComment({ comment, firstName, created_at }: {
-    comment?: string; firstName?: string; created_at?: number
+function MyComment({ comment, firstName, created_at, id, onDelete }: {
+    comment?: string; firstName?: string; created_at?: number; id: number; onDelete: (id: number) => void
 }) {
     const date = new Date(Number(created_at) * 1000);
     return (
@@ -24,11 +24,14 @@ function MyComment({ comment, firstName, created_at }: {
                         ) : (<Typography variant="body2" fontStyle="italic">...</Typography>)}
                         <Typography variant="caption">{date.toLocaleString()}</Typography>
                     </Box>
+                    <Button variant="contained" color="error" onClick={() => onDelete(id)}>删除</Button>
                 </Grid2>
             </Grid2>
         </>
     );
 }
+
+
 
 export default function Comments({ id }: { id: number }) {
 
@@ -43,6 +46,11 @@ export default function Comments({ id }: { id: number }) {
                 setComments(r.data);
             },
         );
+    }
+    function deleteComment(commentId: number) {
+        api().delete(`/comments/${commentId}`).then(() => {
+            fetchComments();
+        });
     }
 
     useEffect(() => {
@@ -88,6 +96,8 @@ export default function Comments({ id }: { id: number }) {
                                 comment={oneOfComments.content}
                                 firstName={oneOfComments.user?.username}
                                 created_at={oneOfComments.created_at}
+                                id={oneOfComments.id}
+                                onDelete={deleteComment}
                             />
                         );
                     })}

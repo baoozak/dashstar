@@ -52,4 +52,23 @@ public class CommentHandler {
         return Response.status(Response.Status.OK).entity(res).build();
     }
 
+    @DELETE
+    @Path("/{id}")
+    @Secured({"admin"})
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteComment(@PathParam("id") Integer id) {
+        try {
+            commentRepository.delete(id);
+            Map<String, Object> res = new HashMap<>();
+            res.put("code", Response.Status.OK);
+            return Response.status(Response.Status.OK).entity(res).build();
+        } catch (Exception e) {
+            Map<String, Object> res = new HashMap<>();
+            res.put("code", Response.Status.INTERNAL_SERVER_ERROR);
+            res.put("message", "Failed to delete comment");
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(res).build();
+        }
+    }
+
+
 }

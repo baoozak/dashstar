@@ -11,6 +11,24 @@ import java.util.List;
 @ApplicationScoped
 public class CommentRepository {
 
+    public void delete(Integer id) throws PersistenceException {
+        EntityManager em = HibernateUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            Comment comment = em.find(Comment.class, id);
+            if (comment != null) {
+                em.remove(comment);
+            }
+            em.getTransaction().commit();
+        } catch (PersistenceException e) {
+            em.getTransaction().rollback();
+            throw new RuntimeException("", e);
+        } finally {
+            em.close();
+        }
+    }
+
+
     public List<Comment> findByArticleId(Integer id) throws PersistenceException {
         EntityManager em = HibernateUtil.getEntityManager();
         List<Comment> comments = null;
