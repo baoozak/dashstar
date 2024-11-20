@@ -69,35 +69,52 @@ public class ArticleRepository {
     }
 
     public void create(Article article) throws PersistenceException {
+        // 获取EntityManager实例
         EntityManager em = HibernateUtil.getEntityManager();
         try {
+            // 开始事务
             em.getTransaction().begin();
+            // 持久化文章对象
             em.persist(article);
+            // 提交事务
             em.getTransaction().commit();
         } catch (PersistenceException e) {
+            // 回滚事务以确保数据一致性
             em.getTransaction().rollback();
+            // 将捕获的PersistenceException包装为RuntimeException并重新抛出
             throw new RuntimeException("", e);
         } finally {
+            // 关闭EntityManager释放资源
             em.close();
         }
     }
 
     public void update(Article article) throws PersistenceException {
+        // 获取EntityManager实例，用于管理和执行数据库操作
         EntityManager em = HibernateUtil.getEntityManager();
         try {
+            // 开始事务，确保数据库操作的完整性
             em.getTransaction().begin();
+            // 根据传入文章的ID从数据库中查找对应的文章实体
             Article existingArticle = em.find(Article.class, article.getId());
             try {
+                // 将传入文章对象的非空属性复制到查找到的文章实体对象中，以实现部分更新
                 HibernateUtil.copyNonNullProperties(article, existingArticle);
             } catch (IllegalAccessException e) {
+                // 如果在复制属性过程中发生访问异常，将其包装为运行时异常并抛出
                 throw new RuntimeException(e);
             }
+            // 将更新后的文章实体合并到当前的持久化上下文中，以便在数据库中更新
             em.merge(existingArticle);
+            // 提交事务，将更改持久化到数据库
             em.getTransaction().commit();
         } catch (PersistenceException e) {
+            // 如果在执行数据库操作过程中发生异常，回滚事务以保持数据一致性
             em.getTransaction().rollback();
+            // 将捕获的持久化异常包装为运行时异常，并抛出，以便调用者可以处理
             throw new RuntimeException("", e);
         } finally {
+            // 关闭EntityManager，释放资源
             em.close();
         }
     }
