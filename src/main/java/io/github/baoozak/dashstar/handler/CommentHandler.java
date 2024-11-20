@@ -58,14 +58,22 @@ public class CommentHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteComment(@PathParam("id") Integer id) {
         try {
+            // 调用评论仓库的删除方法来删除指定ID的评论
             commentRepository.delete(id);
+            // 创建一个映射来存储响应数据
             Map<String, Object> res = new HashMap<>();
+            // 放入成功状态码
             res.put("code", Response.Status.OK);
+            // 返回成功响应
             return Response.status(Response.Status.OK).entity(res).build();
         } catch (Exception e) {
+            // 创建一个映射来存储响应数据
             Map<String, Object> res = new HashMap<>();
+            // 放入失败状态码
             res.put("code", Response.Status.INTERNAL_SERVER_ERROR);
+            // 放入错误信息
             res.put("message", "Failed to delete comment");
+            // 返回失败响应
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(res).build();
         }
     }
