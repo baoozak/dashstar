@@ -40,7 +40,7 @@ export default function HomePage() {
             (res) => {
                 const r = res.data;
                 // 确保 r.data 是数组，并且 r.totalArticles 是数字
-                setArticles(r.data ? r.data.reverse() : []);
+                setArticles(r.data ? r.data: []);
                 setTotalArticles(r.totalArticles || 0); // 新增代码行，假设 totalArticles 在响应的顶层
             },
         );

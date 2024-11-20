@@ -103,7 +103,10 @@ public class ArticleRepository {
     }
 
     public long countAll() {
+        // 获取EntityManager实例，用于执行数据库操作
         EntityManager em = HibernateUtil.getEntityManager();
+        // 创建并执行一条JPQL查询语句，计算Article实体的总数
+        // 使用getSingleResult()方法获取查询结果，由于是计算总数，所以结果是单个Long值
         return em.createQuery("SELECT COUNT(a) FROM Article a", Long.class).getSingleResult();
     }
 }
